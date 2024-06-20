@@ -1,0 +1,9 @@
+demo_site_data.sql是從demo site匯出以下table的資料:
+
+eip_member
+eip_group
+eip_group_member
+techdoc_version
+techdoc_log
+
+有完整的table欄位, 可用此資料來練習SQL語法

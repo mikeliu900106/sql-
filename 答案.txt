@@ -1,0 +1,295 @@
+DB-1
+	2.對資料庫右鍵新增資料庫
+	3.新增:對資料表右鍵新增資料庫
+	  更新:對你選擇的那個資料表按右鍵設計
+	  刪除:對你選擇的那個資料表按右鍵刪除資料表
+	4.
+	  對你選擇的那個資料表按右鍵查詢前100筆資料根據那行更新刪除或新增
+DB-2
+	1.
+	CREATE TABLE eip_member ( 
+		m_account    	nvarchar(32) NOT NULL,
+		m_password   	nvarchar(80) NOT NULL,
+		m_block      	nchar(1) NULL,
+		m_name       	nvarchar(80) NULL,
+		m_email      	nvarchar(80) NULL,
+		m_gender     	nchar(1) NULL,
+ 		PRIMARY KEY (m_account) 
+	)
+	2.
+	CREATE TABLE eip_group ( 
+		g_id         	nvarchar(32) NOT NULL,
+		type_id      	nvarchar(4) NOT NULL,
+		g_name       	nvarchar(50) NULL,
+		g_level      	nchar(3) NULL,
+		g_parentid   	nvarchar(32) NULL,
+		PRIMARY KEY (g_id) 
+	)
+	3.
+	CREATE TABLE eip_group_member ( 
+		m_account	nvarchar(32) NOT NULL,
+		g_id     	nvarchar(32) NOT NULL,
+		status   	nchar(1) NULL ,
+		PRIMARY KEY (g_id,m_account  ) 
+
+	)
+DB-3
+	1.
+	ALTER TABLE eip_member table
+	ADD
+	   is_ad            nvarchar(10)
+	   m_create_date    nvarchar(10)
+	   m_create_time    nvarchar(8)
+DB-4
+	1.
+	INSERT INTO
+	eip_member (m_account, m_password, m_block, m_name, m_email, m_gender, m_create_date, m_create_time, Is_ad)
+    VALUES
+    ('amy', 'amy', 'N', '愛咪', 'amy@tt.com', 'F', '2010/01/01', '09:00:00', 'KM'),
+    ('betty', 'betty', 'N', '貝蒂', 'betty@tt.com', 'F', '2010/11/01', '09:00:00', 'KM'),
+    ('cindy', 'cindy', 'N', '辛蒂', 'cindy@tt.com', 'F', '2011/01/01', '09:00:00', 'KM'),
+    ('john', 'john', 'N', '約翰', 'john@tt.com', 'M', '2012/01/01', '09:00:00', 'AD'),
+    ('mary', 'mary', 'Y', '瑪麗', 'mary@tt.com', 'F', '2012/08/01', '09:00:00', 'KM');
+    2.
+    INSERT INTO eip_group (g_id, type_id, g_name, g_level, g_parentid)
+    VALUES
+    ('A001', 'DEPT', '總經理室', 9, NULL),
+    ('A002', 'DEPT', '人事部', 8, 'A001'),
+    ('A003', 'DEPT', '研發部', 8, 'A001'),
+    ('A004', 'DEPT', '研發一組', 7, 'A003'),
+    ('A005', 'DEPT', '研發二組', 7, 'A003');
+    3.
+    INSERT INTO eip_group_member (m_account, g_id, status)
+    VALUES
+    ('amy', 'A001', 'M'),
+    ('cindy', 'A003', 'M'),
+    ('cindy', 'A004', 'M'),
+    ('john', 'A004', 'M'),
+    ('mary', 'A005', 'M'),
+    ('mary', 'A002', 'A'),
+    ('betty', 'A001', 'A');
+DB-5
+    UPDATE eip_member SET m_email = amy@eland.com.tw WHERE m_account = amy
+DB-6
+    DELETE FROM eip_member WHERE m_block = 'N'
+DB-7
+    SELECT
+        eigm.status,eig.g_name,eim.m_name
+    FROM
+        eip_group_member AS eigm
+    JOIN
+        eip_group AS eig
+    ON
+        eig.g_id = eigm.g_id
+    JOIN
+        eip_member AS eim
+    ON
+        eim.m_account = eigm.m_account
+DB-8
+    SELECT
+        eigm.status,eig.g_name,eim.m_name
+    FROM
+        eip_group_member AS eigm
+    JOIN
+        eip_group AS eig
+    ON
+        eig.g_id = eigm.g_id
+    JOIN
+        eip_member AS eim
+    ON
+        eim.m_account = eigm.m_account
+    ORDER BY
+        eig.g_name , eim.m_name
+DB-9
+    1
+    SELECT
+        *
+    FROM
+        eip_member
+    WHERE
+        m_email LIKE  '%eland%'
+    2
+    SELECT
+        *
+    FROM
+        eip_member
+    WHERE
+        m_email LIKE  'a%'
+DB-10
+    1
+    SELECT
+        *
+    FROM
+        eip_member
+    WHERE
+        m_create_date < '2012/06/01'
+    2
+    SELECT
+        *
+    FROM
+        eip_member
+    WHERE
+        m_create_date > '2012/06/01'
+DB-11
+    SELECT
+      *
+    FROM
+        eip_group_member
+    join
+        eip_member
+    on
+        eip_member.m_account = eip_group_member.m_account
+    WHERE
+        eip_group_member.g_id in ('A001','A002');
+DB-12
+    SELECT
+      *
+    FROM
+        eip_member
+    WHERE
+        is_ad = 'KM'
+    AND
+    (
+        m_account LIKE '%eland%'
+        OR m_name LIKE '%eland%'
+        OR m_email LIKE '%eland%'
+    )
+     AND m_account != 'eipadmin';
+DB-13
+    SELECT
+        eig.g_id ,COUNT(*)
+    FROM
+        eip_group_member AS eigm
+    JOIN
+        eip_group AS eig
+    ON
+        eig.g_id = eigm.g_id
+    JOIN
+        eip_member AS eim
+    ON
+        eim.m_account = eigm.m_account
+    WHERE
+    	eim.m_block = 'N'
+    GROUP BY
+    	eig.g_id
+DB-14
+    SELECT
+        m_account
+    FROM
+        eip_group_member
+    where
+    	    status='A' OR  status=''
+    And
+    	m_account NOT IN(
+    	    SELECT m_account
+    	    FROM eip_group_member
+    	    WHERE status='M'
+    	)
+   	GROUP BY
+   		m_account
+DB-15
+    SELECT
+         m_account
+    FROM
+        eip_group_member
+    where
+    	status='M'
+    GROUP BY
+    	m_account
+    HAVING
+    	COUNT(m_account)>1
+
+
+DB-16
+    SELECT
+    	m_account, COUNT(DISTINCT tl.doc_id)
+    FROM
+    	techdoc_log  AS tl
+    JOIN
+    	eip_group_member AS eigm
+    ON
+    	eigm.m_account = tl.creator
+    WHERE
+    	create_date
+    BETWEEN
+    	'2012/04/01'
+    AND
+    	'2012/06/30'
+    AND
+        act = '021'
+    GROUP BY
+        eigm.m_account
+DB-17
+    SELECT
+        tl.doc_id,
+        tl.ver_id,
+        tl.create_date,
+        tl.create_time,
+        eim.m_account,
+        eim.m_name
+    FROM
+        techdoc_log AS tl
+    LEFT JOIN
+        eip_member AS eim
+    ON
+        tl.creator = eim.m_account;
+    WHERE
+        tl.act = '021 '
+DB-18
+    UPDATE
+    	tl
+    SET
+    	tl.creator = tv.creator
+    FROM
+    	techdoc_log AS tl
+    INNER JOIN
+    	techdoc_version AS tv
+    ON
+    	tl.doc_id = tv.doc_id
+    WHERE
+    	tl.ver_id = tv.ver_id;
+DB-19
+    WITH doc (tvId)
+    AS
+    	(
+    	SELECT
+    		 tv.doc_id
+    	FROM
+    		techdoc_log AS tl
+    	JOIN
+    		eip_member AS eim ON eim.m_account = tl.creator
+    	JOIN
+    		techdoc_version AS tv ON tv.doc_id = tl.doc_id
+    	WHERE
+    		tl.act = '021'
+    		AND tv.create_date BETWEEN '2012/04/01' AND '2012/06/30'
+    		AND tv.status NOT IN ('D', 'CI')
+    		AND tv.ver_delete = 'N'
+    		AND eim.Is_ad = 'KM'
+    	GROUP BY
+    		tv.doc_id, tv.creator
+    )
+    SELECT eim.m_account, COUNT(tvId)
+    FROM
+    	eip_member AS eim
+    join
+    	techdoc_log AS tl
+    on
+    	eim.m_account = tl.creator
+    join
+    	doc
+    on
+    	doc.tvId = tl.doc_id
+    where
+    	eim.m_block = 'N'
+    AND
+    	tl.act = '002'
+    GROUP BY
+    	eim.m_account
+點閱人員
+    1.create_date between '2012/04/01' AND '2012/06/30'
+    2.STATUS NOT IN('D','CI')
+    3.is_ad = 'KM'
+作者
+DB-20
+
